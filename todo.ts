@@ -1,6 +1,6 @@
 import { load, save } from "./file.ts";
-import { getFormattedDate } from "./util.ts";
-import { green, blue } from "./deps.ts";
+import { getFormattedDate, getDateFromStr } from "./util.ts";
+import { green, blue, red } from "./deps.ts";
 
 interface Todo {
   checked: boolean;
@@ -24,6 +24,9 @@ export function processTodoCommand(command: string, input: string) {
       break;
     case "create":
       createTodo(input);
+      break;
+    case "list":
+      listTodo(input);
       break;
     default:
       createTodo(command);
@@ -60,9 +63,20 @@ export function createTodo(text: string) {
 
 export function printTodo(date: string, todo: Todo[]) {
   if (todo) {
-    console.log(blue(`Todo ${date}`));
+    console.log(blue(date));
     todo.forEach(printTodoItem);
   }
+}
+
+export function listTodo(userDate: string) {
+  const dateStr = getFormattedDate(getDateFromStr(userDate));
+  load(dateStr, (data: any) => {
+    if (data.todo) {
+      printTodo(dateStr, data.todo);
+    } else {
+      console.log(red(`No entry for ${dateStr}`));
+    }
+  });
 }
 
 export function printTodoItem(todo: Todo, index: number) {
